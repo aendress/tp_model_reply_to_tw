@@ -1,0 +1,899 @@
+---
+title: 'Hebbian, correlational learning provides a memory-less mechanism for Statistical Learning irrespective of implementational choices: Reply to Tovar & Westermann'
+author: |
+  | Ansgar D. Endress, City, University of London
+  | Scott P. Johnson, UCLA
+bibliography:
+- /Users/endress/ansgar.bib
+output:
+  pdf_document:
+    citation_package: natbib
+    keep_tex: yes
+    number_sections: yes
+    toc: no
+  html_notebook:
+    number_sections: yes
+    theme: spacelab
+    toc: yes
+    toc_float: yes
+  html_document:
+    df_print: paged
+    number_sections: yes
+    theme: spacelab
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: no
+keywords: Keywords
+csl: /Users/endress/csl_files/apa.csl
+abstract: TO BE WRITTEN
+---
+
+```{r setup, echo = FALSE, include=FALSE}
+rm (list=ls())
+
+#load("~/Experiments/TP_model/tp_model.RData")
+
+#options (digits = 3)
+knitr::opts_chunk$set(
+    # Run the chunk
+    eval = TRUE,
+    # Don't include source code
+    echo = FALSE, 
+    # Print warnings to console rather than the output file
+    warning = FALSE,  
+    # Stop on errors
+    error = FALSE,
+    # Print message to console rather than the output file
+    message = FALSE,
+    # Include chunk output into output
+    include = TRUE,
+    # Don't reformat R code
+    tidy = FALSE,
+    # Center images
+    # Breaks showing figures side by side, so switch this to default
+    fig.align = 'center', 
+    # Show figures where they are produced
+    fig.keep = 'asis',
+    # Prefix for references like \ref{fig:chunk_name}
+    fig.lp = 'fig',
+    # For double figures, and doesn't hurt for single figures 
+    fig.show = 'hold', 
+    # Default image width
+    out.width = '100%')
+
+# other knits options are here:
+# https://yihui.name/knitr/options/
+
+```
+
+```{r load-libraries, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+
+# Read in a random collection of custom functions
+if (Sys.info()[["user"]] %in% c("ansgar", "endress")){
+    source ("/Users/endress/R.ansgar/ansgarlib/R/tt.R")
+    source ("/Users/endress/R.ansgar/ansgarlib/R/null.R")
+    #source ("helper_functions.R")
+} else {
+    # Note that these will probably not be the latest versions
+    source("http://endress.org/progs/tt.R")
+    source("http://endress.org/progs/null.R")
+}
+
+library ("knitr")
+library(latex2exp)
+# library (cowplot)
+library (R.matlab)
+```
+
+# Text starts here
+Statistical learning relies on detecting the frequency of co-occurrences of items, and has been proposed to be crucial for a variety of learning problems [@Aslin1998;@Kirkham2002;@Morgan2019;@Saffran-Science;@Saffran1996b;@Saffran2001;@Stalinski2010;@Turk-Browne-reversal;@Verosky2021], notably learning words from fluent speech [@Aslin1998;@Aslin2012;@Saffran-Science;@Saffran1996b]. We recently showed that such results can be explained based on simple correlational learning mechanisms such as Hebbian Learning [@Endress-TP-Model] (hereafter EJ). [@Tovar2022] (hereafter TW) reproduced these results with a slightly different model (with temporal decay acting on both the connection weight and the activations, rather than on only the activations, and interference affecting weights rather than activations), and offering different interpretations of some network parameters (e.g., conceiving of forgetting as decay).
+
+Here, we first stress the common theoretical interpretation of both models: While Statistical Learning is often assumed to help learners learn (and thus *memorize*) words from fluent speech [@Estes2007; @Isbilen2020], the tasks used to explore Statistical Learning can be explained by a memory-less correlational learning model. As a result, Statistical Learning might be more useful for predictive processing than for learning words *per se* [@Endress-stat-recall;@Morgan2019;@Sherman2020;@Turk-Browne2010;@Verosky2021]. Following this, we  briefly discus the differences between EJ's and TW's models. As already argued by EJ, we agree that different implementations of correlational learning are likely to result in fairly similar results. However, we also show that, contrary to TW's characterization of their model, activation decay is critical to the model performance, and argue that models of psychological phenomena should be evaluated by their psychological predictions rather than by reference to "biological plausibility" when neither model includes no  biophysical detail whatsoever. 
+
+# A memory-less interpretion of Statistical Learning
+One of the primary motivations of Statistical Learning is that it might allow learners to extract (and memorize) words from fluent speech [@Aslin1998;@Aslin2012;@Saffran-Science;@Saffran1996b]. Speech is often thought to be a continuous signal (but see [@Brentari2011; @Christophe2001; @Endress-cross-seg; @Johnson2001a; @Johnson2009; @Pilon1981; @Shukla2007 @Shukla2011]). As a result, to acquire any word, learners first need to learn where words start and where they end. They might use Transitional Probabilities (TPs) among syllables, that is, the conditional probability of a syllable \(\sigma_{i+1}\) given a preceding syllable \(\sigma_{i}\), \(P(\sigma_{i}\sigma_{i+1})/P(\sigma_{i})\). Unpredictable transitions might indicate a word boundary, while relatively predictable transitions are likely located inside words. Humans are sensitive to TPs [@Aslin1998;@Kirkham2002;@Morgan2019;@Saffran-Science;@Saffran1996b;@Saffran2001;@Stalinski2010;@Turk-Browne-reversal], and might use this sensitivity to memorize words [@Estes2007; @Isbilen2020]. 
+
+However, the evidence that Statistical Learning leads to memory for words is mixed at best (see [@Endress2020] for a critical review). For example, when exposed to statistically structured sequences, participants are sometimes more familiar with high-TP items than with low-TP items, even when they have never encountered either of them and thus could not have memorized them (because the items are played backwards with respect to the familiarization sequence; [@Endress-Action-Axc; @Jones2007; @Turk-Browne-reversal]). In other cases, participants are more familiar with high-TP items they have \emph{never} heard or seen than with low-TP items they have encountered [@Endress-Phantoms-Vision; @Endress-Phantoms]. Further, when instructed to repeat back the items they remember from a statistically structured familiarization sequences, participants seem unable to do so [@Endress-stat-recall]. 
+
+Such results thus suggest that Statistical Learning abilities do not necessarily support the formation of declarative memories for words. This interpretation mirrors earlier demonstrations of dissociations between Statistical Learning and declarative memory [@Cohen1980; @Finn2016; @Graf1984; @Poldrack2001; @Squire1992], and suggests that Statistical Learning might be more useful for predictive processing rather than declarative memory formation [@Endress-stat-recall;@Morgan2019;@Sherman2020;@Turk-Browne2010;@Verosky2021].
+
+Both EJ's and TW's are consistent with this view. EJ simulated the results with a fully connected network where the strength of excitatory connections among neurons was tuned by Hebbian learning. That is, if two neurons are active simultaneously, their connection becomes strengthened ("what fires together wires together"). The network also comprised inhibitory connections among neurons. Further, the network had a "forgetting" mechanism, where activity decayed as time passed. After familiarization with a speech stream, the network was tested by recording the total activation when presented with different types of test items. 
+
+The basic result was that this fairly generic network accounted for a number of Statistical Learning results. Critically, given that all learning resided in the connection strength, it could do so without any memory representations at all. In fact, just as in humans participants [@Endress-Phantoms-Vision; @Endress-Phantoms], the network activation was determined by the associative strength of the syllables in a item, irrespective of whether the network had encountered the item or not. As a result, the network had  no memory representation of either item (or one would need to conclude that the network rememebered items it never encountered). 
+
+EJ also found that, to account for these Statistical Learning results, the forgetting rate needed to be reasonable. Rather unsurprisingly, if forgetting was so fast neurons were never active together, no learning ensued. Conversely, if forgetting was so slow that all neurons were active simultaneously, all neurons formed connections, making these indiscriminate connections useless as an indicator of learning.  
+
+# Differences between EJ's and TW's model
+TW reproduced these results in a similar network, confirming that basic Hebbian learning mechanisms can explain Statistical Learning results, to some extent independently of how they are implemented. As far as we can see, there are four main differences between TW's and EJ's models. First, TW take issue with our characterization of decay as forgetting. Second, TW stress the importance of spreading activation. Third, TW evaluate learning by inspecting connections rather than activations. Fourth, instead of including separate inhibitory and decay/forgetting components that affect activations (and thus indirectly connection weights), their model uses a modified Hebbian learning rule (with an additional parameter) where decay/forgetting affects weights (and thus indirectly activations); this learning rule also comprises a thresholding mechanisms that presumably mimics the effects of mutual inhibition. 
+
+Regarding the interpretation of EJ's "forgetting" parameter, TW "argue that [interpreting decay as forgetting] may be a misleading interpretation. Activation values from external stimuli in both artificial and biological networks are non-persistent but are constantly updated in response to changes in the environment [@Huber2003]." While we are not particularly committed to the label "forgetting" and while persistent neural activity has been widely documented in various brain areas [@Major2004], we would question to what extent results from single neuron recordings are relevant for *psychological* models that are not particularly plausible biologically; for example both EJ's and TW's "neurons" code for speaker-independent, phonological representations of syllables, which would presumably be encoded by some kind of population code in actual brains [@Pouget2000]. As a result, neurophysiological findings may not be informative about psychological theories. In fact, the question of time-based decay exists in memory is a controversial one in cognitive psychology. Under some circumstances, humans can remember thousands of items for hours or weeks [@Brady2008;@Standing1973]; under other circumstances, very similar pictures disappear from memory after a few seconds but can be reviewed through repeated exposure [@Endress-WM-LTM;@Pertzov2009;@Thunell2019]. Further, it is controversial whether there is any decay in Short-Term Memory at all, or whether all decreases in memory are due to interference [@Baddeley1971;@Berman2009;@Lewandowsky2009;@Nairne1999]. We are thus open to different psychological interpretations of the forgetting parameter, and  EJ already acknowledged the possibility that the effects of their forgetting parameter could likely be mimicked by tuning inhibition.
+
+In contrast, forgetting/decay is critical to TW's model. They use decay in two places. First,the activation of each input is maintained only for two time steps (at 90% for the second time step); given that the current input is likely the strongest activation at each time step, the effects are similar to a global forgetting parameter. Second, TW consider only activation greater than a certain threshold. While the latter affects the results only insofar as it reduced the overall magnitude of the weights, the former is critical for the results. To illustrate this fact, we exposed the network to the familiarization stream from [@@Saffran-Science] Experiment 2, and then recorded the weights in high-TP items ("words") and low-TP items (part-words, of BC:D and C:DE type, a difference that is irrelevant for the current purposes). We ran 1000 simulations with three version of TW's model: With the original decay function from TW ("Standard" in Figure \ref{fig:plot-weights}), no forgetting at all (i.e., the input to each neurons was the cumulative sum of prior inputs; "Never" in Figure \ref{fig:plot-weights}) and immediate forgetting (i.e., the activation decays immediately after presentation; "Immediate" in Figure \ref{fig:plot-weights}). As shown in Figure \ref{fig:plot-weights}, the network discriminated between words and part-words only using TW's decay function; as in EJ's simulations, all weights reach the maximum of 1.0 in the absence of decay, and reached zero with immediate forgetting. A suitably chosen decay parameter is thus crucial to TW's model. Be that is it might, we believe that the merits of a psychological model should be evaluated by its empirical adequacy, and links between psychological parameters and neurobiological findings should be investigated empirically. 
+
+```{r load-matlab}
+
+
+tmp <- readMat('tw_weights.mat')
+
+lapply (dimnames (tmp$testTransitions)[[1]],
+        function (EXP) {
+        tmp$testTransitions[EXP,,] %>% 
+            as.data.frame %>% 
+            setNames (c("words", "part.words.bcd", "part.words.cde")) %>% 
+            dplyr::mutate (exp = EXP, .before = 1)
+        }
+) %>% bind_rows %>% 
+    separate (exp, c("Experiment", "act.decay", "activation.thresold"), sep = "\\.") -> 
+    dat.weights.wide 
+            
+        
+
+dat.weights.wide %>% 
+    pivot_longer(matches ("words"), 
+                 names_to = "item.type", 
+                 values_to = "weight", 
+                 values_drop_na = TRUE) -> dat.weights.long
+```
+
+
+```{r analyze-weights, eval = FALSE}    
+
+dat.weights.wide %>% 
+    mutate (d = words - part.words) %>% 
+    group_by(Experiment, act.decay, activation.thresold) %>% 
+    dplyr::summarize (
+        N = n(),
+        words = mean (words),
+        part.words = mean (part.words),
+        d = mean (d, na.rm = TRUE),
+        p = wilcox.p (d)) %>% 
+    kable (caption = "Descriptives")
+
+```
+
+
+```{r plot-weights, fig.cap="Average connection weights of the test items in a simulation of [@Saffran-Science] Experiment 2. High-TP items (words) are discriminated from low-TP items (part-words of differen types) only with a suitable decay function. With no decay, all weights are maximal; with immediate forgetting, no connections are formed.", fig.height=2.75}
+
+format_theme %<a-% 
+{
+    theme_light() +
+        theme(#text = element_text(size=20), 
+            plot.title = element_text(size = 18, hjust = .5),
+            axis.title = element_text(size=16),
+            axis.text.x = element_text(size=14, angle = 45),
+            axis.text.y = element_text(size=14),
+            legend.title = element_text(size=16),
+            legend.text = element_text(size=14))
+}
+
+
+remove_x_axis  %<a-% 
+{
+    
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank())
+}
+
+
+
+
+
+ dat.weights.long %>% 
+     filter (grepl ("Saffran", Experiment)) %>% 
+     filter (grepl ("WithThreshold", activation.thresold)) %>% 
+     mutate (item.type = factor (item.type, levels = c("words", "part.words.bcd", "part.words.cde")),
+             act.decay = factor (act.decay, levels = c("Std", "None", "Complete")),
+             act.decay = plyr::revalue (act.decay, c("Std" = "Standard", "None" = "Never", "Complete" = "Immediate"))) %>% 
+    ggplot(aes(x=item.type, y=weight, fill=item.type))+
+    format_theme + 
+    remove_x_axis + 
+    labs (#title = "XXX",
+          y = "Average Weight") +
+    facet_wrap( ~ act.decay)+#, scales = "free_y") +
+    scale_fill_discrete(name = element_blank(),
+                        labels = c(part.words.bcd = "Part-Words (BC:D)",
+                                   part.words.cde = "Part-Words (C:DE)", 
+                                   words = "Words")) +
+    theme(legend.position = "bottom",
+          legend.direction = "horizontal") + 
+    geom_boxplot()  
+
+
+
+```
+
+Regarding the importance for spreading activation for network performance, we agree, and, in their Section 2, EJ explained the role of spreading activation in detail. 
+
+Given the importance of spreading activation, it is surprising that TW evaluate their model by inspecting connections weights rather than measuring activations. In fact, even in a network with uniform connections and no learning, it is hard to derive closed-form expressions for the network dynamics [@Endress-Catastrophic-Interference]. Given that, in TW's model, interference and decay act on weights rather than activations, this problem might be somewhat reduced in their model, but it is still hard to evaluate the dynamic interplay of first and higher order associations just based on the pattern fof weights. 
+
+The most critical difference between EJ and TWs models is the learning rule. TW's learning rule has two components. First, all weights undergo decay. This decay is proportional to the current weight and the product of the activations connected by that weight (i.e., $\Delta_{\text{Decay}} W_{AB} \propto - W_{AB} \times \text{activation}_A \times \text{activation}_B$, where $A$ and $B$ are two neurons). However, given that, even in the simple Hebbian learning rule $\Delta W_{AB} \propto  \text{activation}_A \times \text{activation}_B$, the weight change is proportional to product of the activations, the effects of decay on learning will be very similar irrespective of whether decay originates from weights, activations or, as in TW's model, both. However, in the absence of targeted experiments investigating the empirical adequacy of weight-based vs activation-based decay, the key result is that both formalism account for Statistical Learning results in the absence of a memory mechanism.
+
+The second component of TW's learning rule is the strengthening of associations according to the simple Hebbian learning rule above. Critically, however, TW's model strengthens connections only when the product of the activation exceeds an arbitrary threshold ($\text{activation}_A \times \text{activation}_B > \theta$). However, the effect of this thresholding is similar to inhibitory connections. To see why this is the case, consider two pairs of neurons. The activations in each pair are roughly similar to each other, but the activation in the first pair is somewhat larger than in the second pair (i.e, $\text{activation}_A \approx \text{activation}_B > \text{activation}_C \approx \text{activation}_D$). If there is inhibition, the first pair will reduce the activation of the second pair as long as the inhibitory input exceeds the excitatory input (though the difference does not necessarily disappear; [@Endress-Catastrophic-Interference]). Given that weight changes are proportional to the product of the corresponding activations, connections between neurons with greater coactivation will still be strengthened to a greater extent. Again, we believe that targeted psychological experiments are necessary to gauge the empirical adequacy of activation-based vs. weight-based inhibition, but, to the extent that biological plausibility is relevant for psychological models, the ubiquity of lateral inhibition across domains and taxa certainly suggest that activation-based inhibition in no less plausible than weight-based inhibition. 
+
+`r clearpage ()`
+
+TW also proposed some more specific criticisms of EJ's network. For example, TW argued that "it is not clear their [EJ's] model prevents excessive growth of connections" (p. ???). However, it is easy to see from EJ's Hebbian learning rule that the final weight of the connection between two neurons after $t$ time steps is proportional to the average coactivation of the neurons, $W_{AB}(t) \propto t \times \left<\text{activation}_A \times \text{activation}_B\right>$ (for $W_{AB}(0)=0$). As a result, if the activations remain in a reasonable range, so will the weights. This is confirmed when examining the connection weights after familiarization with a stream modeled after [@Saffran-Science] Experiment 2. As shown in Figure \ref{fig:basic-experiment-global-create-plot_weights}, connection weights diverge for slow decay rates of up to .2, but generally stay below or around 1 for faster decay rates. In other words, weights stay in a reasonable range for decay rates that led to learning in EJ's simulations; for decay rates that we too slow for learning to occur, weights diverge as well. This confirms our point above that qualitatively similar results can be achieved by controlling weights (and thus indirectly activations, as in TW's simulations) or by controlling activations (and thus indirectly weights, as in EJ's simulations).
+
+Related, TW questioned EJ's rationale for not varying their interference parameter (p. ???). However, and as mentioned above, EJ argued that their "interference parameter might well mimic the role of forgetting," and thus simply sought to limit the number of moving parts in their model. To see why this is the case, consider a network of $N$ neurons that receive external stimulation in a regular sequence. In the absence of external stimulation and noise, the activation change between times $t$ and $t+1$ is given by (exponential) decay (first term), spreading activation (second term) and inhibition (third term).
+
+$$
+x_i (t+1) - x_i (t) = - \lambda_a x_i(t) + \alpha \sum_{j \neq i} w_{ij} F(x_j) - \beta \sum_{j \neq i} F(x_j)
+$$
+
+If the connectivity is relatively sparse (i.e., if there are many neurons), spreading activation will be limited, and only a relatively constant number of neurons will be active to deliver inhibitory input to all other neurons. In other words, the inhibitory input to each neuron will be relatively constant. Mathematically, the effect of constant inhibitory input is similar to that of decay, except that it is linear rather than exponential (though the specific functional form is likely more complex due to spreading activation). Given that EJ's objective was to make the conceptual point that Statistical Learning results can be reproduced by a simple, memory-less correlational learning mechanism, they did not explore alternative implementations of this idea. However, TW's model confirms that EJ's results can be reproduced with different implementations.  
+
+
+In sum, both EJ and TW show that a memory-less correlational learning mechanism can account for Statistical Learning results, despite differences in implementation, irrespective of whether decay and inhibition affect activations or weights. As a result, to the extent that Statistical Learning supports declarative memory formation for words, relevant evidence is still required.  
+
+# Code for printing weights
+
+(The code below is copied from the original model.)
+
+```{r set-default-parameters-network, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+
+# Number of neurons
+N_NEURONS <- 19
+
+ACT_FNC <- 'rational_logistic'
+
+# Forgetting for activation
+L_ACT_DEFAULT <- 0.5
+L_ACT_SAMPLES <- seq (0, 1, .2)
+#L_ACT <- L_ACT_DEFAULT
+L_ACT <- L_ACT_SAMPLES
+
+# Forgetting for weights
+L_W <- 0
+
+# Activation coefficient
+A <- .7
+
+# Inhibition coefficient 
+B <- .4
+
+# Learning coefficient
+R <- 0.05
+
+# noise for activation
+NOISE_SD_ACT <- 0.001
+
+# noise for weights
+NOISE_SD_W <- 0
+```
+
+```{r set-default-parameters-simulations, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+
+# Number of items (e.g., words)
+N_WORDS <- 4
+
+# Number of units per item (e.g., syllables)
+N_SYLL_PER_WORD <- 3
+
+# Number of repetitions per word
+N_REP_PER_WORD <- 100
+
+# Number of simulations/subjects
+N_SIM <- 100
+
+# Adjust number of neurons if required
+if (N_NEURONS < ((N_WORDS * N_SYLL_PER_WORD) + 1))
+    N_NEURONS <- (N_WORDS * N_SYLL_PER_WORD) + 1
+
+PRINT.INDIVIDUAL.PDFS <- TRUE
+current.plot.name <- "xxx"
+
+# Set seed to Cesar's birthday
+set.seed (1207100)
+```
+
+
+```{r define-functions, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+
+act_fnc <- function (act, fnc = ACT_FNC, ...){
+    
+    switch (fnc,
+            "rational_logistic" = act / (1 + act),
+            "relu" = pmax (0, act),
+            "tanh" = tanh (act),
+            stop ("Unknown activation function"))
+}
+
+make_act_vector <- function (ind, n_neurons){
+    
+    act <- rep (0, n_neurons)
+    act[ind] <- 1
+    
+    return (act)
+    
+}
+
+update_activation <- function (act, w, ext_input, l_act = 1, a = 1, b = 0, noise_sd = 0, ...){
+    # activation, weights, external_input, decay, activation coefficient, inhibition coefficient
+    
+    act_output <- act_fnc (act, ...)
+    
+    act_new <- act
+    
+    # Decay     
+    if (l_act>0)
+        act_new <- act_new - l_act * act 
+    
+    # External input
+    act_new <- act_new + ext_input
+    
+    # Excitation
+    act_new <- act_new + (a * w %*% act_output)
+    
+    # Inhibition (excluding self-inhibition)
+    act_new <- act_new - (b * (sum (act_output) - act_output))
+    
+    # Noise
+    if (noise_sd > 0)    
+        act_new <- act_new + rnorm (length(act_new), 0, noise_sd)
+    
+    act_new <- as.vector(act_new)
+    
+    act_new[act_new < 0] <- 0
+    
+    return (act_new)
+}
+
+update_weights <- function (w, act, r = 1, l = 0, noise_sd, ...){
+    
+    act_output <- act_fnc (act, ...)
+    
+    # learning 
+    w_new <- w  + r * outer(act_output, act_output)
+    
+    # decay
+    if (l > 0)
+        w_new <- w_new - l * w 
+    
+    if (noise_sd > 0)
+        w_new <- w_new + as.matrix (rnorm (length(w_new),
+                                           0,
+                                           noise_sd),
+                                    ncol = ncol (w_new))
+    
+    # No self-excitation
+    diag (w_new) <- 0
+    
+    w_new[w_new < 0] <- 0
+    
+    return (w_new)
+}
+
+familiarize <- function (stream_matrix,
+                         l_act = 1,
+                         a = 1,
+                         b = 0, 
+                         noise_sd_act = 0,
+                         r = 1,
+                         l_w = 0,
+                         noise_sd_w = 0,
+                         n_neurons = max (stream),
+                         return.act.and.weights = FALSE,
+                         ...){
+    
+    # Initialization
+    act <- abs(rnorm (n_neurons, 0, noise_sd_act))
+    w <- matrix (abs(rnorm (n_neurons^2, 0, noise_sd_w)), 
+                 ncol = n_neurons)
+    diag(w) <- 0
+    
+    if (return.act.and.weights)
+        act.weight.list <- list ()
+    
+    # Randomize familiarization 
+    stream_matrix <- stream_matrix[sample(nrow(stream_matrix)),]
+    stream <- c(t(stream_matrix))
+    
+    act_sum <- c()
+    for (item in stream){
+        
+        current_input <- make_act_vector(item, n_neurons)
+        
+        act <- update_activation(act, w, current_input, 
+                                 l_act, a, b, noise_sd_act,
+                                 ...)
+        
+        if (r > 0)
+            w <- update_weights (w, act, r, l_w, noise_sd_w)
+        
+        act_sum <- c(act_sum, sum(act))
+        
+        if (return.act.and.weights){
+            act.weight.list[[1 + length(act.weight.list)]] <- 
+                list (item = item,
+                      act = act,
+                      w = w)
+            
+        }
+    }
+    
+    if (return.act.and.weights)
+        return (list (
+            w = w,
+            act_sum = act_sum,
+            act.weight.list = act.weight.list))
+    else
+        return (list (
+            w = w,
+            act_sum = act_sum))
+}
+
+test_list <- function (test_item_list,
+                       w,
+                       l_act = 1, a = 1, b = 0, 
+                       noise_sd_act = 0,
+                       n_neurons,
+                       return.global.act = FALSE,
+                       ...) {
+    # Arguments
+    #   test_item_list  List of test-items (i.e., numeric vectors)
+    #   w               Current weight matrix
+    #   l_act           Forgetting rate for activation. Default:  1
+    #   a               Excitatory coefficient. Default: 1
+    #   b               Inhibitory coefficient. Default: 0
+    #   noise_sd_act    Standard deviation of the activation noise. Default: 0
+    #   n_neurons       Number of neurons in the network.
+    #   return.global.act 
+    #                   Sum total activation in each test-item (TRUE) or just 
+    #                   the activation in the test-item (FALSE)
+    #                   Default: FALSE
+    
+    test_act_sum <- data.frame (item = character(),
+                                act = numeric ())
+    
+    for (ti in test_item_list){
+        
+        act <- abs(rnorm (n_neurons, 0, noise_sd_act))
+        
+        act_sum <- c()
+        
+        for (item in ti){
+            
+            current_input <- make_act_vector(item, n_neurons)
+            act <- update_activation(act, res$w, current_input, 
+                                     l_act, a, b, noise_sd_act,
+                                     ...)
+            
+            if (return.global.act)
+                act_sum <- c(act_sum, sum(act))
+            else 
+                act_sum <- c(act_sum, sum(act[ti]))
+        }
+        
+        test_act_sum <- rbind (test_act_sum,
+                               data.frame (item = paste (ti, collapse="-"),
+                                           act = sum (act_sum)))
+    }   
+    
+    test_act_sum <- test_act_sum %>%
+        column_to_rownames ("item") %>% 
+        t
+    
+    return (test_act_sum)
+}
+
+make_diff_score <- function (dat = ., 
+                             col.name1,
+                             col.name2,
+                             normalize.scores = TRUE,
+                             luce.rule = FALSE){
+    
+    if (luce.rule){
+            d.score <- dat[,col.name1]
+            normalize.scores <- TRUE
+    } else {
+        d.score <- dat[,col.name1] - dat[,col.name2]
+    }
+    
+    if (any (d.score != 0) &&
+        (normalize.scores))
+        d.score = d.score / (dat[,col.name1] + dat[,col.name2])
+    
+    return (d.score)
+    
+}
+
+summarize_condition <- function (dat,
+                                 selected_cols,
+                                 selected_cols_labels){ 
+    
+    sapply (selected_cols,
+            function (X){
+                c(M = mean (dat[,X]),
+                  SE = mean (dat[,X]) / 
+                      sqrt (length (dat[,X]) -1),
+                  p.wilcox = wilcox.test (dat[,X])$p.value,
+                  p.simulations = mean (dat[,X] > 0))
+            },
+            USE.NAMES = TRUE) %>% 
+        #signif (3) %>%
+        as.data.frame() %>%
+        setNames (gsub ("\n", " ",
+                        selected_cols_labels[selected_cols])) %>%
+        # format_engr removes them otherwise
+        rownames_to_column ("Statistic")
+        #docxtools::format_engr(sigdig=3) 
+    
+}
+
+format_p_simulations <- function (prop_sim){ 
+    
+    p_sim <- 100 * prop_sim
+    
+    min_diff_from_chance <- 
+        get.min.number.of.correct.trials.by.binom.test(N_SIM)
+    min_diff_from_chance <- 100 * min_diff_from_chance / N_SIM
+    min_diff_from_chance <- min_diff_from_chance - 50
+    
+    p_sim <- ifelse (abs (p_sim-50) >= min_diff_from_chance,
+                    paste ("({\\bf ", p_sim, " \\%})", 
+                           sep =""), 
+                    paste ("(", p_sim, " \\%)", 
+                           sep ="") )
+    
+    return (p_sim)
+}
+
+get_sign_pattern_from_results <- function (l_act, dat){
+
+    sign_pattern <- lapply (l_act, 
+        function (CURRENT_L){
+            tmp_p_values <- dat %>%
+                filter (l_act == CURRENT_L) %>%
+                dplyr::select (-c("l_act")) %>%
+                column_to_rownames("Statistic")
+            
+            # Convert the proportion of simulations with a given outcome 
+            # to a string; note that the proportion always gives the proportion 
+            # for the majority pattern
+            tmp_p_simulations <- tmp_p_values["p.simulations",] %>%
+                mutate_all(format_p_simulations)
+            
+            # Extract the significance pattern into 
+            # * + (significant preference for target)
+            # * - (significant preference for foil)
+            # * 0 (no significant preference)
+            tmp_sign_pattern <- (tmp_p_values["p.wilcox",] <= .05) * 1
+            tmp_sign_pattern <- tmp_sign_pattern * 
+                sign(tmp_p_values["M",])
+            
+            tmp_sign_pattern <- tmp_sign_pattern %>%
+                mutate_all(function (X) 
+                    ifelse (X > 0, 
+                            "+", 
+                            ifelse (X < 0, 
+                                    "-", 
+                                    "0") ) )
+            
+            tmp_sign_pattern <- 
+                tmp_sign_pattern %>%
+                as.data.frame() %>%
+                paste (., tmp_p_simulations, sep = " ") %>% 
+                t () %>%
+                as.data.frame() %>%
+                setNames (names (tmp_sign_pattern)) %>% 
+                add_column(l_act = CURRENT_L, .before = 1) %>%
+                rownames_to_column("rowname") %>%
+                dplyr::select (-c("rowname"))
+            
+            return (tmp_sign_pattern)
+        }
+    )
+    
+    sign_pattern <- do.call ("rbind", sign_pattern)
+    
+    sign_pattern
+}
+
+get_sign_pattern_for_plot %<a-% {
+    # From https://github.com/kassambara/ggpubr/issues/79
+    
+    . %>%
+        melt (id.vars = "l_act",
+              variable.name= "ItemType",
+              value.name = "d") %>%
+        group_by (l_act, ItemType) %>%
+        rstatix::wilcox_test(d ~ 1, mu = 0) %>%
+        mutate (p.star = ifelse (p > .05, "",
+                                 ifelse (p > .01,
+                                         "*",
+                                         ifelse (p > .001,
+                                                 "**",
+                                                 "***")))) %>%
+        mutate(y.position = 0)
+}
+ 
+add_signif_to_plot <- function (gp, 
+                                dat.df,
+                                selected_cols){
+ 
+    panel.info <- ggplot_build(gp)$layout$panel_params
+
+    y.max <- lapply (panel.info, 
+               function (X) max (X$y.range)) %>% 
+        unlist %>%
+        rep (., each = length (selected_cols))
+
+    df.signif <- dat.df[,c("l_act",
+                         selected_cols)] %>%
+        get_sign_pattern_for_plot %>%
+        mutate (y.position = y.max)
+    
+    gp <- gp + 
+        ggpubr::stat_pvalue_manual(df.signif, 
+                               label="p.star", 
+                               xmin="l_act", 
+                               xmax = "ItemType", 
+                               remove.bracket = TRUE)
+
+    return (gp)
+}
+
+
+format_theme %<a-% 
+{
+    theme_light() +
+        theme(#text = element_text(size=20), 
+            plot.title = element_text(size = 18, hjust = .5),
+            axis.title = element_text(size=16),
+            axis.text.x = element_text(size=14, angle = 45),
+            axis.text.y = element_text(size=14),
+            legend.title = element_text(size=16),
+            legend.text = element_text(size=14))
+}
+
+remove_x_axis  %<a-% 
+{
+    
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank())
+}
+
+rename_stuff_in_tables %<a-% {
+    . %>%
+        setNames (gsub ("l_act", "$\\\\lambda_a$", names (.))) %>%
+        mutate (Statistic = compose (
+            function (X) {gsub ("^M$", "*M*", X)},
+            function (X) {gsub ("^SE$", "*SE*", X)},
+            function (X) {gsub ("^p.wilcox$", "$p_{Wilcoxon}$", X)},
+            function (X) {gsub ("^p.simulations$", "$P_{Simulations}$", X)}
+        ) (Statistic)) 
+}
+
+find_chain_parts <- function() {
+    # From https://stackoverflow.com/questions/42560389/get-name-of-dataframe-passed-through-pipe-in-r
+    i <- 1
+    while(!("chain_parts" %in% ls(envir=parent.frame(i))) && i < sys.nframe()) {
+          i <- i+1
+      }
+    parent.frame(i)
+}
+
+print.plot <- function (p, 
+                        p.name = NULL,
+                        print.pdf = PRINT.INDIVIDUAL.PDFS){
+    
+    if (is.null (p.name)){
+    # From https://stackoverflow.com/questions/42560389/get-name-of-dataframe-passed-through-pipe-in-r
+    
+     ee <- find_chain_parts()
+     p.name <- deparse(ee$lhs)
+    }
+    
+    if (print.pdf){
+        
+        pdf.name = sprintf ("figures/%s.pdf",
+                            gsub ("\\.", "\\_",
+                                  p.name))
+        pdf (pdf.name)
+        print (p)
+        invisible(dev.off ())
+    }
+    
+    print (p)
+}
+
+italisize_for_tex <- function (x = .){
+    gsub("\\*(.+?)\\*", 
+         "{\\\\em \\1}", 
+         x, perl = TRUE)
+}
+
+```
+
+```{r define-caption-functions}
+
+# Here we define functions to print the figure captions for consistency across figures
+
+get.comparisons.for.caption <- function (experiment_type){
+    
+    if (experiment_type == "basic") {
+        
+        return ("Unit vs. Part-Unit: {\\em ABC} vs. {\\em BC:D} and {\\em ABC} vs. {\\em C:DE}; Rule-Unit vs. Class-Unit: {\\em AGC} vs. {\\em AGF} and {\\em AXC} vs. {\\em AXF}")
+        
+    } else if (experiment_type == "phantoms") {
+        
+        return ("Unit vs. Part-Unit: {\\em ABC} vs. {\\em BC:D} and {\\em ABC} vs. {\\em C:DE}; Phantom-Unit vs. Part-Unit: Phantom-Unit vs. {\\em BC:D} and Phantom-Unit vs. {\\em C:DE}; Unit vs. Phantom-Unit")
+        
+    } else {
+        stop ("Unknown experiment type.")
+    }
+}
+
+write.caption.diff.scores <- function (experiment_type, label, order, activation_type) {
+    
+    comparisons <- get.comparisons.for.caption(experiment_type)
+    
+    caption.text <- sprintf('\\label{fig:%s}Difference scores for items presented in {\\bf %s order}, different forgetting rates (0, 0.2, 0.4, 0.6, 0.8 and 1), and for the different comparisons (%s). The scores are calculated based the %s as a measure of the network\'s familiarity with the items. Significance is assessed based on Wilcoxon tests against the chance level of zero.',
+                            label, order, comparisons, activation_type)
+    
+    return (caption.text)
+}
+
+write.caption.p.sim <- function (experiment_type, label, order, activation_type) {
+    
+    comparisons <- get.comparisons.for.caption(experiment_type)
+    
+    caption.text <- sprintf('\\label{fig:%s}Percentage of simulations with a preference for the target items for items presented in {\\bf %s order}, different forgetting rates (0, 0.2, 0.4, 0.6, 0.8 and 1) and for the different comparisons (%s). The simulations are assessed based on the %s. The dashed line shows the minimum percentage of simulations that is significant based on a binomial test.',
+                            label, order, comparisons, activation_type)
+    
+    return (caption.text)
+}
+
+```
+
+
+
+```{r basic-experiment-run, echo = FALSE}
+fam_basic <- matrix (rep(1:(N_WORDS * N_SYLL_PER_WORD), 
+                         N_REP_PER_WORD), 
+                     byrow = TRUE, ncol=N_SYLL_PER_WORD)
+
+test_items_basic <- list (1:3,        # W
+                          2:4,        # PW (BCA) 
+                          3:5,        # PW (CAB)
+                          c(1,4,3),   # RW (moved middle syllable)
+                          c(1,4,9),   # CW (moved middle syllable)
+                          c(1,19,3),  # RW (new middle syllable)
+                          c(1,19,9)   # CW (new middle syllable)
+)
+test_items_basic <- c(test_items_basic, 
+                      lapply (test_items_basic, 
+                              rev))
+
+# We test-items in two ways: by recording the activation in the test-items themselves
+# and by recording the activation in the entire network (_global)
+
+
+test_act_sum_basic_list <- list ()
+test_act_sum_basic_global_list <- list ()
+
+# Added June 2022
+final_weights_basic <- data.frame ()
+
+for (current_l in L_ACT){
+    # Sample through forgetting values 
+    
+    current_test_act_sum_basic <- data.frame()
+    current_test_act_sum_basic_global <- data.frame()
+    
+    for (i in 1:N_SIM){
+        
+        res <- familiarize (stream = fam_basic,
+                            l_act = current_l, a = A, b = B, noise_sd_act = NOISE_SD_ACT,
+                            r = R, l_w = L_W, noise_sd_w = NOISE_SD_W,
+                            n_neurons = 19)
+        
+        #plot (res$act_sum, type="l")
+        
+        # Record activation in test-items
+        current_test_act_sum_basic <- rbind (current_test_act_sum_basic,
+                                             test_list (test_item_list = test_items_basic,
+                                                        w = res$w,
+                                                        l_act = current_l, a = A, b = B, 
+                                                        noise_sd_act = NOISE_SD_ACT,
+                                                        n_neurons = 19,
+                                                        return.global.act = FALSE)) 
+        
+        # Record global activation in network
+        current_test_act_sum_basic_global <- rbind (current_test_act_sum_basic_global,
+                                             test_list (test_item_list = test_items_basic,
+                                                        w = res$w,
+                                                        l_act = current_l, a = A, b = B, 
+                                                        noise_sd_act = NOISE_SD_ACT,
+                                                        n_neurons = 19,
+                                                        return.global.act = TRUE)) 
+        
+        # Added June 2022
+        # Record weights
+        final_weights_basic <- rbind (final_weights_basic,
+                                      data.frame (
+                                          l_act = current_l,
+                                          w_mean = mean (res$w[1:max(fam_basic),1:max(fam_basic)]),
+                                          w_max = max (res$w[1:max(fam_basic),1:max(fam_basic)])))
+
+    }
+    
+    # End of forgetting sampling loop
+    
+    test_act_sum_basic_list[[1 + length (test_act_sum_basic_list)]]  <- 
+        current_test_act_sum_basic
+    
+    test_act_sum_basic_global_list[[1 + length (test_act_sum_basic_global_list)]]  <- 
+        current_test_act_sum_basic
+    
+
+}
+
+# Combine results from different forgetting rates
+test_act_sum_basic <- 
+    do.call (rbind, 
+             test_act_sum_basic_list)
+
+test_act_sum_basic <- test_act_sum_basic %>% 
+    add_column(l_act = rep (L_ACT,
+                            sapply (test_act_sum_basic_list,
+                                    nrow)),
+               .before = 1
+    )
+
+test_act_sum_basic_global <- 
+    do.call (rbind, 
+             test_act_sum_basic_global_list)
+
+test_act_sum_basic_global <- test_act_sum_basic_global %>% 
+    add_column(l_act = rep (L_ACT,
+                            sapply (test_act_sum_basic_global_list,
+                                    nrow)),
+               .before = 1
+    )
+
+
+```
+
+
+
+
+```{r basic-experiment-global-create-plot_weights, fig.cap="Final weights after simulation of stream from Saffran et al. (1996). Mean (left) and maximal (right) weights for slow (top) and fast (bottom) forgetting rates."}
+
+final_weights_basic %>%  
+    #group_by(l_act) %>% summarize (N = n(), M = mean (w_mean), Max = max (w_max))
+    pivot_longer(starts_with("w"), 
+                 names_to = "measure", 
+                 values_to = "W") %>% 
+    mutate (measure = str_remove (measure, "w_"),
+            measure = str_to_title(measure),
+            measure = factor (measure, levels = rev (levels2 (measure)))) %>% 
+    mutate (l_range = factor (ifelse (l_act <= .2, "Slow forgetting", "Fast forgetting"))) %>% 
+    mutate (l_range = factor (l_range, levels = rev (levels (l_range)))) %>% 
+    mutate (l_act = factor (l_act)) %>% 
+    ggplot(aes(x=l_act, y = W , fill = l_act))+
+    geom_boxplot()  +
+    format_theme + 
+    #remove_x_axis + 
+    labs (title = "Average and maximum weights",
+          x = TeX ("$\\Lambda$"),
+          y = "W") +
+    #coord_trans(y = "log") +
+#     scale_x_discrete(name = "Item Type",
+#                      breaks = 1:4,                 
+#                      labels=                         selected_cols_labels[selected_cols_fw]) + 
+    facet_wrap(l_range ~ measure, 
+               scales = "free") +
+#    scale_fill_discrete(name = element_blank(), 
+#                        labels = selected_cols_labels[selected_cols_fw]) + 
+    theme(legend.position = "none",
+          strip.text.y = element_blank())
+
+
+
+```
+
+`r clearpage ()`
